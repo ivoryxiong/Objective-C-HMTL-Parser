@@ -13,7 +13,7 @@
 
 -(HTMLNode*)parent
 {
-	return [[HTMLNode alloc] initWithXMLNode:_node->parent];	
+	return [[HTMLNode alloc] initWithXMLNode:_node->parent];
 }
 
 -(HTMLNode*)nextSibling {
@@ -24,51 +24,25 @@
 	return [[HTMLNode alloc] initWithXMLNode:_node->prev];
 }
 
-void setAttributeNamed(xmlNode * node, const char * nameStr, const char * value) {
-	
-	char * newVal = (char *)malloc(strlen(value)+1);
-	memcpy (newVal, value, strlen(value)+1);
-
-	for(xmlAttrPtr attr = node->properties; NULL != attr; attr = attr->next)
-	{
-		if (strcmp((char*)attr->name, nameStr) == 0)
-		{				
-			for(xmlNode * child = attr->children; NULL != child; child = child->next)
-			{
-				free(child->content);
-				child->content = (xmlChar*)newVal;
-				break;
-			}
-			break;
-		}
-	}
-	
-	
-}
-
-NSString * getAttributeNamed(xmlNode * node, const char * nameStr)
-{
-	for(xmlAttrPtr attr = node->properties; NULL != attr; attr = attr->next)
-	{
-		if (strcmp((char*)attr->name, nameStr) == 0)
-		{				
-			for(xmlNode * child = attr->children; NULL != child; child = child->next)
-			{
-				return [NSString stringWithCString:(void*)child->content encoding:NSUTF8StringEncoding];
-				
-			}
-			break;
-		}
-	}
-	
-	return NULL;
+- (void)setAttributeNamed:(NSString*)name withValue:(NSString*)value {
+    xmlSetProp(_node, (xmlChar*)[name cStringUsingEncoding:NSUTF8StringEncoding], (xmlChar*)[value cStringUsingEncoding:NSUTF8StringEncoding]);
 }
 
 -(NSString*)getAttributeNamed:(NSString*)name
-{	
+{
 	const char * nameStr = [name UTF8String];
 	
-	return getAttributeNamed(_node, nameStr);
+    xmlChar * value = xmlGetProp(_node, (xmlChar*)nameStr);
+    if (value) {
+        return [NSString stringWithCString:(const char *)value encoding:NSUTF8StringEncoding];
+    }
+    return NULL;
+}
+
+-(BOOL)removeAttributeNamed:(NSString*)name {
+	const char * nameStr = [name UTF8String];
+    xmlAttrPtr attrPtr = xmlHasProp(_node, (xmlChar*)nameStr);
+    return 0 == xmlRemoveProp(attrPtr);
 }
 
 //Returns the class name

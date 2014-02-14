@@ -60,6 +60,12 @@ typedef enum
 //Gets the attribute value matching tha name
 -(NSString*)getAttributeNamed:(NSString*)name;
 
+//Set the attribute named "name" with value
+- (void)setAttributeNamed:(NSString*)name withValue:(NSString*)value;
+
+//Remove the attribute matching tha name
+-(BOOL)removeAttributeNamed:(NSString*)name;
+
 //Find childer with the specified tag name
 -(NSArray*)findChildTags:(NSString*)tagName;
 
